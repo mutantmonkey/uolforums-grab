@@ -1,4 +1,4 @@
-jamiiforums-grab
+UOLforums-grab
 =============
 
 More information about the archiving project can be found on the ArchiveTeam wiki: [UOL Forums](https://archiveteam.org/index.php?title=UOL_Forums)
