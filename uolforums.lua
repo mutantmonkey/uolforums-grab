@@ -31,6 +31,17 @@ read_file = function(file)
   end
 end
 
+read_file_part = function(file, size)
+  if file then
+    local f = io.open(file)
+    local data = f:read(size)
+    f:close()
+    return data or ""
+  else
+    return ""
+  end
+end
+
 allowed = function(url, parenturl)
   if string.match(url, "'+")
      or string.match(url, "[<>\\%*%$;%^%[%],%(%)]")
@@ -162,6 +173,17 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end
     if string.match(newloc, "^https?://forum%.jogos%.uol%.com%.br/;jsessionid=") then
       return wget.actions.EXIT
+    end
+  end
+
+  if (status_code == 200 and string.match(url["url"], "^http?://forum%.jogos%.uol%.com%.br/")) then
+    -- Read first 50 KiB of the file, check whether it contains an error message
+    local html = read_file_part(http_stat["local_file"], 51200)
+    if string.match(html, '<div class="msg error">') then
+      io.stdout:write("Server returned an error message. Sleeping.\n")
+      io.stdout:flush()
+      os.execute("sleep 60")
+      abortgrab = true
     end
   end
 
