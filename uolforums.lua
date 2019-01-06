@@ -180,9 +180,10 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     -- Read first 50 KiB of the file, check whether it contains an error message
     local html = read_file_part(http_stat["local_file"], 51200)
     if string.match(html, '<div class="msg error">') then
-      io.stdout:write("Server returned an error message.\n")
+      io.stdout:write("Server returned an error message. Flagging for abortion.\n")
       io.stdout:flush()
       abortgrab = true
+      return wget.actions.CONTINUE
     end
   end
 
@@ -191,11 +192,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     downloaded[string.gsub(url["url"], "https?://", "http://")] = true
   end
 
-  if abortgrab == true then
-    io.stdout:write("ABORTING...\n")
-    return wget.actions.ABORT
-  end
-  
   if status_code >= 500 or
     (status_code >= 400 and status_code ~= 404) or
     status_code == 0 then
@@ -230,6 +226,7 @@ end
 
 wget.callbacks.before_exit = function(exit_status, exit_status_string)
   if abortgrab == true then
+    io.stdout:write("ABORTING...\n")
     return wget.exits.IO_FAIL
   end
   return exit_status
