@@ -182,7 +182,6 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     if string.match(html, '<div class="msg error">') then
       io.stdout:write("Server returned an error message. Sleeping.\n")
       io.stdout:flush()
-      os.execute("sleep 60")
       abortgrab = true
     end
   end
