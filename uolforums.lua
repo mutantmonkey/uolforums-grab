@@ -180,7 +180,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     -- Read first 50 KiB of the file, check whether it contains an error message
     local html = read_file_part(http_stat["local_file"], 51200)
     if string.match(html, '<div class="msg error">') then
-      io.stdout:write("Server returned an error message. Sleeping.\n")
+      io.stdout:write("Server returned an error message.\n")
       io.stdout:flush()
       abortgrab = true
     end
