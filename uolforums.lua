@@ -155,6 +155,7 @@ end
 wget.callbacks.httploop_result = function(url, err, http_stat)
   status_code = http_stat["statcode"]
   url_count = url_count + 1
+  local error_thread_page = false
 
   io.stdout:write(url_count .. "=" .. status_code .. " " .. url["url"] .. "  \n")
   io.stdout:flush()
@@ -176,14 +177,15 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     end
   end
 
-  if (status_code == 200 and string.match(url["url"], "^http?://forum%.jogos%.uol%.com%.br/")) then
-    -- Read first 50 KiB of the file, check whether it contains an error message
+  -- Verify that thread pages contain posts
+  if (status_code == 200 and string.match(url["url"], "^http?://forum%.jogos%.uol%.com%.br/.*_t_%d+")) then
+    -- Read first 50 KiB of the file
     local html = read_file_part(http_stat["local_file"], 51200)
-    if string.match(html, '<div class="msg error">') then
-      io.stdout:write("Server returned an error message. Flagging for abortion.\n")
+    if not string.match(html, '<div%s+class="[^"]*post') then
+      io.stdout:write("Thread page missing posts. Flagging for abortion.\n")
       io.stdout:flush()
+      error_thread_page = true
       abortgrab = true
-      return wget.actions.CONTINUE
     end
   end
 
@@ -194,10 +196,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
 
   if status_code >= 500 or
     (status_code >= 400 and status_code ~= 404) or
-    status_code == 0 then
-    io.stdout:write("Server returned "..http_stat.statcode.." ("..err.."). Sleeping.\n")
-    io.stdout:flush()
-    os.execute("sleep 1")
+    status_code == 0 or
+    error_thread_page then
+    if not error_thread_page then
+      io.stdout:write("Server returned "..http_stat.statcode.." ("..err.."). Sleeping.\n")
+      io.stdout:flush()
+      os.execute("sleep 1")
+    end
     tries = tries + 1
     if tries >= 3 then
       io.stdout:write("\nI give up...\n")
