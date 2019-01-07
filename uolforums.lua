@@ -61,6 +61,13 @@ allowed = function(url, parenturl)
   return false
 end
 
+wget.callbacks.lookup_host = function(host)
+  if (host == "forum.jogos.uol.com.br") then
+    return "200.147.35.152"
+  end
+  return nil
+end
+
 wget.callbacks.download_child_p = function(urlpos, parent, depth, start_url_parsed, iri, verdict, reason)
   local url = urlpos["url"]["url"]
   local html = urlpos["link_expect_html"]
