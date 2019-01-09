@@ -58,7 +58,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20190107.01'
+VERSION = '20190109.01'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'uolforums'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -194,11 +194,11 @@ class WgetArgs(object):
         item['item_type'] = item_type
         item['item_value'] = item_value
 
-        if item_type == 'jogos':
+        if item_type in ('jogos', 'esporte', 'televisao', 'tecnologia'):
             start, end = (int(i) for i in item_value.split('-'))
             for id_ in range(start, end+1):
-                wget_args.extend(['--warc-header', 'uolforums-jogos-thread-id: {}'.format(id_)])
-                wget_args.append('http://forum.jogos.uol.com.br/_t_{}'.format(id_))
+                wget_args.extend(['--warc-header', 'uolforums-{}-thread-id: {}'.format(item_type, id_)])
+                wget_args.append('http://forum.{}.uol.com.br/_t_{}'.format(item_type, id_))
         else:
             raise Exception('Unknown item')
 

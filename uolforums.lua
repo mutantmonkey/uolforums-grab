@@ -46,11 +46,11 @@ allowed = function(url, parenturl)
   if string.match(url, "'+")
      or string.match(url, "[<>\\%*%$;%^%[%],%(%)]")
      or string.match(url, "//$")
-     or not string.match(url, "^https?://[^/]*forum%.jogos%.uol%.com%.br/") then
+     or not string.match(url, "^https?://[^/]*forum%." .. item_type .. "%.uol%.com%.br/") then
     return false
   end
 
-  if item_type == "jogos" then
+  if item_type == "jogos" or item_type == "esporte" or item_type == "televisao" or item_type == "tecnologia" then
     for id in string.gmatch(url, "_t_([0-9]+)") do
       if ids[tonumber(id)] == true then
         return true
@@ -62,7 +62,7 @@ allowed = function(url, parenturl)
 end
 
 wget.callbacks.lookup_host = function(host)
-  if (host == "forum.jogos.uol.com.br") then
+  if host == "forum.jogos.uol.com.br" or host == "forum.esporte.uol.com.br" or host == "forum.televisao.uol.com.br" or host == "forum.tecnologia.uol.com.br" then
     return "200.147.35.152"
   end
   return nil
@@ -132,7 +132,7 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   if allowed(url, nil) then
     html = read_file(file)
 
-    if item_type == "jogos" and string.match(url, "_t_[0-9]+%?page=[0-9]+$") then
+    if (item_type == "jogos" or item_type == "esporte" or item_type == "televisao" or item_type == "tecnologia") and string.match(url, "_t_[0-9]+%?page=[0-9]+$") then
       check(string.match(url, "^([^%?]+)"))
     end
 
@@ -179,13 +179,13 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     if downloaded[newloc] == true or addedtolist[newloc] == true then
       return wget.actions.EXIT
     end
-    if string.match(newloc, "^https?://forum%.jogos%.uol%.com%.br/;jsessionid=") then
+    if string.match(newloc, "^https?://forum%." .. item_type .. "%.uol%.com%.br/;jsessionid=") then
       return wget.actions.EXIT
     end
   end
 
   -- Verify that thread pages contain posts
-  if (status_code == 200 and string.match(url["url"], "^http?://forum%.jogos%.uol%.com%.br/.*_t_%d+")) then
+  if (status_code == 200 and string.match(url["url"], "^http?://forum%." .. item_type .. "%.uol%.com%.br/.*_t_%d+")) then
     -- Read first 50 KiB of the file
     local html = read_file_part(http_stat["local_file"], 51200)
     if not string.match(html, '<div%s+class="[^"]*post') then
