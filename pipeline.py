@@ -58,7 +58,7 @@ if not WGET_LUA:
 #
 # Update this each time you make a non-cosmetic change.
 # It will be added to the WARC files and reported to the tracker.
-VERSION = '20190109.01'
+VERSION = '20190113.01'
 USER_AGENT = 'ArchiveTeam'
 TRACKER_ID = 'uolforums'
 TRACKER_HOST = 'tracker.archiveteam.org'
@@ -177,7 +177,7 @@ class WgetArgs(object):
             '--no-parent',
             '--page-requisites',
             '--timeout', '30',
-            '--tries', 'inf',
+            '--tries', '20',
             '--domains', 'uol.com.br',
             '--span-hosts',
             '--waitretry', '30',
