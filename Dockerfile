@@ -13,7 +13,7 @@ WORKDIR /usr/src/wget-lua
 COPY get-wget-lua.sh /usr/src/wget-lua/
 RUN ./get-wget-lua.sh
 
-FROM python:3-alpine
+FROM python:3-alpine3.8
 
 RUN apk add --no-cache git gnutls lua5.1 rsync zlib \
     && adduser -D -u 1000 grabber \
